@@ -8,7 +8,8 @@ export default async function RecruitPage() {
   let loadError = false;
   try {
     groups = await getActiveJobPostingsByStudio();
-  } catch {
+  } catch (err) {
+    console.error("getActiveJobPostingsByStudio failed:", err);
     loadError = true;
   }
 
