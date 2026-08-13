@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import type { ActiveJobPostingGroup } from "@/lib/queries";
-import ApplyToggle from "./ApplyToggle";
 
 const SOURCE_LABEL: Record<string, string> = {
   SARAMIN: "사람인",
@@ -66,7 +65,6 @@ export default function RecruitSearch({ groups }: { groups: ActiveJobPostingGrou
                   <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
                     {SOURCE_LABEL[p.source] ?? p.source}
                   </span>
-                  <ApplyToggle source={p.source} postingId={p.postingId} initialApplied={p.applied} />
                 </span>
               </li>
             ))
