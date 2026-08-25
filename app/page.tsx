@@ -1,15 +1,24 @@
-import { getActiveJobPostingsByStudio } from "@/lib/queries";
+import { getActiveJobPostingsByStudio, getKeywordJobPostings } from "@/lib/queries";
 import RecruitSearch from "./RecruitSearch";
+import KeywordJobList from "./KeywordJobList";
 
 export const dynamic = "force-dynamic";
 
+const RECRUIT_KEYWORDS = ["웹툰PD"];
+
 export default async function RecruitPage() {
   let groups: Awaited<ReturnType<typeof getActiveJobPostingsByStudio>> = [];
+  let keywordResults: { keyword: string; postings: Awaited<ReturnType<typeof getKeywordJobPostings>> }[] = [];
   let loadError = false;
   try {
-    groups = await getActiveJobPostingsByStudio();
+    const [groupsResult, ...keywordPostingsResults] = await Promise.all([
+      getActiveJobPostingsByStudio(),
+      ...RECRUIT_KEYWORDS.map((k) => getKeywordJobPostings(k)),
+    ]);
+    groups = groupsResult;
+    keywordResults = RECRUIT_KEYWORDS.map((keyword, i) => ({ keyword, postings: keywordPostingsResults[i] }));
   } catch (err) {
-    console.error("getActiveJobPostingsByStudio failed:", err);
+    console.error("채용공고 조회 실패:", err);
     loadError = true;
   }
 
@@ -26,6 +35,11 @@ export default async function RecruitPage() {
           Supabase 연결 설정이 필요합니다.
         </div>
       )}
+
+      {!loadError &&
+        keywordResults.map(({ keyword, postings }) => (
+          <KeywordJobList key={keyword} keyword={keyword} postings={postings} />
+        ))}
 
       {!loadError && <RecruitSearch groups={groups} />}
     </div>
